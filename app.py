@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 from sklearn.feature_extraction.text import CountVectorizer
 
 # Load your trained model
-model = load_model("C:/Users/91934/Downloads/utubesentiment/sentiment.h5")  # Replace 'your_model.h5' with the actual path to your trained model file
+model = load_model("sentiment.h5")  # Replace 'your_model.h5' with the actual path to your trained model file
 
 # Load the CountVectorizer's vocabulary using pickle
 with open('vectorizer_vocabulary.pkl', 'rb') as vocab_file:
