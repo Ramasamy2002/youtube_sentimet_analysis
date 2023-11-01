@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+import os
 import pandas as pd
+from flask import Flask, render_template, request
 from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from tensorflow.keras.models import load_model
@@ -7,8 +8,8 @@ import numpy as np
 
 app = Flask(__name__)
 
-# Load your trained model
-model = load_model("sentimentt.h5")  # Replace 'your_model.h5' with the actual path to your trained model file
+# Load your trained CNN model
+model = load_model("C:/Users/91934/Downloads/utubesentiment/sentimentc.h5")
 
 # Load the CountVectorizer's vocabulary using pickle
 vectorizer = CountVectorizer(decode_error="replace")
@@ -24,19 +25,26 @@ def index():
 
 @app.route('/predict', methods=['POST'])
 def predict_sentiment():
-    data = request.form.get('comments')
+    user_input = request.form.get('comments')
 
     # Tokenize and vectorize the input comments
-    new_comments_vectorized = vectorizer.transform([data]).toarray()
+    new_comments_vectorized = vectorizer.transform([user_input]).toarray()
 
-    # Make predictions with your model
+    # Ensure that the input data has the expected shape (None, 145)
+    if new_comments_vectorized.shape[1] > 145:
+        new_comments_vectorized = new_comments_vectorized[:, :145]
+    elif new_comments_vectorized.shape[1] < 145:
+        # You can pad with zeros if needed
+        padding = 145 - new_comments_vectorized.shape[1]
+        new_comments_vectorized = np.pad(new_comments_vectorized, ((0, 0), (0, padding)), 'constant')
+
+    # Make predictions with your CNN model
     predictions = model.predict(new_comments_vectorized)
 
     # Interpret predictions
-    predicted_labels = np.argmax(predictions, axis=1)
-    predicted_sentiment = sentiment_labels[predicted_labels[0]]
+    predicted_label = sentiment_labels[np.argmax(predictions)]
 
-    return render_template('result.html', sentiment=predicted_sentiment)
+    return render_template('result.html', sentiment=predicted_label)
 
 if __name__ == '__main__':
     app.run(debug=True)
