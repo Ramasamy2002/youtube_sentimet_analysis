@@ -8,7 +8,7 @@ import numpy as np
 app = Flask(__name__)
 
 # Load your trained model
-model = load_model("sentiment.h5")  # Replace 'your_model.h5' with the actual path to your trained model file
+model = load_model("sentimentt.h5")  # Replace 'your_model.h5' with the actual path to your trained model file
 
 # Load the CountVectorizer's vocabulary using pickle
 vectorizer = CountVectorizer(decode_error="replace")
